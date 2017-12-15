@@ -32,48 +32,58 @@ def run_demo(args, mirror=False):
 	cam.set(4, height)
 	key = 0
 	idx = 0
+	freeze2art = False 
 	while True:
 		# read frame
 		idx += 1
-		ret_val, img = cam.read()
-		if mirror: 
-			img = cv2.flip(img, 1)
+		if not freeze2art:
+			ret_val, img = cam.read()
+			if mirror: 
+				img = cv2.flip(img, 1)
 		cimg = img.copy()
-		img = np.array(img).transpose(2, 0, 1)
+		if freeze2art:
+			img = np.array(img).transpose(2, 0, 1)
 		# changing style 
-		if idx%20 == 1:
+		#if idx%20 == 1:
 			style_v = style_loader.get(int(idx/20))
 			style_v = Variable(style_v.data, volatile=True)
 			style_model.setTarget(style_v)
 
-		img=torch.from_numpy(img).unsqueeze(0).float()
-		if args.cuda:
-			img=img.cuda()
+			img=torch.from_numpy(img).unsqueeze(0).float()
+			if args.cuda:
+				img=img.cuda()
 
-		img = Variable(img, volatile=True)
-		img = style_model(img)
+			img = Variable(img, volatile=True)
+			img = style_model(img)
 
-		if args.cuda:
-			simg = style_v.cpu().data[0].numpy()
-			img = img.cpu().clamp(0, 255).data[0].numpy()
-		else:
-			# simg = style_v.data().numpy()
-			simg = style_v.data[0].numpy()
-			img = img.clamp(0, 255).data[0].numpy()
-		img = img.transpose(1, 2, 0).astype('uint8')
-		simg = simg.transpose(1, 2, 0).astype('uint8')
+			if args.cuda:
+				simg = style_v.cpu().data[0].numpy()
+				img = img.cpu().clamp(0, 255).data[0].numpy()
+			else:
+				simg = style_v.data[0].numpy()
+				img = img.clamp(0, 255).data[0].numpy()
+			img = img.transpose(1, 2, 0).astype('uint8')
+			simg = simg.transpose(1, 2, 0).astype('uint8')
 
 		# display
-		simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
-		cimg[0:sheight,0:swidth,:]=simg
-		img = np.concatenate((cimg,img),axis=1)
+			simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
+			cimg[0:sheight,0:swidth,:]=simg
+			img = np.concatenate((cimg,img),axis=1)
 		cv2.imshow('MSG Demo', img)
-		#cv2.imwrite('stylized/%i.jpg'%idx,img)
+		if freeze2art:
+			while True:
+				key = cv2.waitKey(1)
+				if key == ord('r'):
+					freeze2art = False
+					break
+		##cv2.imwrite('stylized/%i.jpg'%idx,img)
 		key = cv2.waitKey(1)
-		if args.record:
-			out.write(img)
+		#if args.record:
+		#	out.write(img)
 		if key == 27: 
 			break
+		if key == ord('f'):
+			freeze2art = True
 	cam.release()
 	if args.record:
 		out.release()

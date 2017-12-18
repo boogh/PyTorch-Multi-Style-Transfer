@@ -30,7 +30,16 @@ This repo provides PyTorh Implementation of **[MSG-Net (ours)](#msg-net)** and *
 	</tbody>
 </table>
 
+
 ### Stylize Images Using Pre-trained MSG-Net
+
+0. Install `opencv` and `pytorch` in a conda environment:
+	```bash
+	conda install -c conda-forge opencv
+	conda install pytorch torchvision -c soumith
+	```
+
+	
 0. Download the pre-trained model
 	```bash
 	git clone git@github.com:zhanghang1989/PyTorch-Style-Transfer.git

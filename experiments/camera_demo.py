@@ -2,6 +2,8 @@ import os
 import cv2
 import numpy as np
 import torch
+from screeninfo import get_monitors
+import tkinter as tk
 from torch.autograd import Variable
 
 from net import Net
@@ -10,6 +12,40 @@ import utils
 from utils import StyleLoader
 
 def run_demo(args, mirror=False):
+	# VARS
+	# scaling is to resize the images (cam and art)
+	scaling=1.0
+	# source_scaling is to resize the used painting 
+	source_scaling=1.0
+	# x is along the horizontal, y is along the vertical
+	# (0,0) is top left
+	# art position in fractions of the screen
+	art_x = 0.5
+	art_y = 0.4
+	# source painting position in fractions of the screen
+	source_x = 0.4
+	source_y = 0.1
+	# camera position in fractions of the scteen
+	cam_x = 0.05
+	cam_y = 0.4
+
+	root = tk.Tk()
+	screen_width = root.winfo_screenwidth()
+	screen_height = root.winfo_screenheight()
+	# fix to resolution of external screen - then it pops to that screen on my linux laptop (hack)
+	screen_width=1920
+	screen_height=1080
+	# calculate positions of images in screen
+	cposx=int(cam_x*screen_width)
+	sposx=int(source_x*screen_width)
+	aposx=int(art_x*screen_width)
+	cposy=int(cam_y*screen_height)
+	sposy=int(source_y*screen_height)
+	aposy=int(art_y*screen_height)
+	# read background image
+	bimg=cv2.imread('bg.png')
+	# resize background to full screen
+	bimg = cv2.resize(bimg,(screen_width, screen_height), interpolation = cv2.INTER_CUBIC)
 	#code to get focus in window
 	cv2.namedWindow("GetFocus", cv2.WINDOW_NORMAL)
 	img = np.zeros((100, 100, 1), dtype = "uint8")
@@ -30,12 +66,12 @@ def run_demo(args, mirror=False):
 	# Define the codec and create VideoWriter object
 	height =  args.demo_size
 	width = int(4.0/3*args.demo_size)
-	swidth = int(width/4)
-	sheight = int(height/4)
+	swidth = int(source_scaling*width/4)
+	sheight = int(source_scaling*height/4)
 	if args.record:
 		fourcc = cv2.VideoWriter_fourcc('F','M','P','4')
 		out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (2*width, height))
-	cam = cv2.VideoCapture(0)
+	cam = cv2.VideoCapture(1)
 	cam.set(3, width)
 	cam.set(4, height)
 	key = 0
@@ -46,10 +82,13 @@ def run_demo(args, mirror=False):
 	style_loaded =False
 	#stop when q pressed
 	stopped = False
+	dimg = bimg.copy()
 	while not stopped:
 		# read frame
 		if not freeze2art:
 			ret_val, img = cam.read()
+			if not ret_val:
+				continue
 			if mirror: 
 				img = cv2.flip(img, 1)
 		cimg = img.copy()
@@ -83,9 +122,36 @@ def run_demo(args, mirror=False):
 			#   resize the used painting
 			simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
 			#   include in the left image
-			cimg[0:sheight,0:swidth,:]=simg
-			#   create merge of 2 images
-			dimg = np.concatenate((cimg,img),axis=1)
+			#   resize the cam image
+			cih,ciw = cimg.shape[:2]
+			ncih = int(scaling*cih)
+			nciw = int(scaling*ciw)
+			ccimg = cv2.resize(cimg,(nciw, ncih), interpolation = cv2.INTER_CUBIC)
+			cih,ciw = ccimg.shape[:2]
+			# position of the cam image to copy into
+			a=cposy
+			b=cposy+cih
+			c=cposx
+			d=cposx+ciw
+			dimg[a:b,c:d,:]=ccimg
+			# position of the source painting image to copy into
+			a=sposy
+			b=sposy+sheight
+			c=sposx
+			d=sposx+swidth
+			dimg[a:b,c:d,:]=simg
+			#   resize the art image
+			aih,aiw = img.shape[:2]
+			naih = int(scaling*aih)
+			naiw = int(scaling*aiw)
+			aaimg = cv2.resize(img,(naiw, naih), interpolation = cv2.INTER_CUBIC)
+			aih,aiw = aaimg.shape[:2]
+			# position of the art image to copy into
+			a=aposy
+			b=aposy+aih
+			c=aposx
+			d=aposx+aiw
+			dimg[a:b,c:d,:]=aaimg
 		else:
 			# load on style change or first use
 			if not style_loaded:
@@ -102,11 +168,28 @@ def run_demo(args, mirror=False):
 			# display
 			#   resize the used painting
 			simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
-			dimg = img.copy()
+			dimg = bimg.copy()
 			#   include in the image
-			dimg[0:sheight,0:swidth,:]=simg
+			# position of the source painting image to copy into
+			a=sposy
+			b=sposy+sheight
+			c=sposx
+			d=sposx+swidth
+			dimg[a:b,c:d,:]=simg
+			#   resize the cam image
+			cih,ciw = img.shape[:2]
+			ncih = int(scaling*cih)
+			nciw = int(scaling*ciw)
+			ccimg = cv2.resize(img,(nciw, ncih), interpolation = cv2.INTER_CUBIC)
+			cih,ciw = ccimg.shape[:2]
+			# position of the cam image to copy into
+			a=cposy
+			b=cposy+cih
+			c=cposx
+			d=cposx+ciw
+			dimg[a:b,c:d,:]=ccimg
 		# put the image in the window
-		cv2.imshow('MSG Demo', dimg)
+		cv2.imshow('Selfie 2 Art', dimg)
 		if freeze2art:
 			resumed = False
 			#wait for r (resume) or q (quit)

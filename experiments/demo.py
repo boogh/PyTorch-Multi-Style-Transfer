@@ -13,68 +13,14 @@ from utils import StyleLoader
 import time
 import threading 
 
-def countdown(cam , mirror, scaling ,cposy,cposx, sposy, sposx, sheight, swidth, style_v , bimg, args):
+def countdown():
   now=time.time()
   timer = 0
-  while timer < 12:
-    # name =  str(timer) + '.png'
-    # takeAPic(cam , mirror, scaling ,cposy,cposx , dimg)
-    # cv2.imwrite(name , dimg)
-    # cv2.imshow('Selfie 2 Art', dimg)
-    
-
-    # ret_val, img = cam.read()
-    # if mirror:
-    #   img = cv2.flip(img, 1)  
-    # if args.cuda:
-    #   simg = style_v.cpu().data[0].numpy()
-    # else:
-    #   simg = style_v.data[0].numpy()
-    # simg = simg.transpose(1, 2, 0).astype('uint8')
-
-    # # display
-    # #   resize the used painting
-    # simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
-    # dimg = bimg.copy()
-    # #   include in the image
-    # # position of the source painting image to copy into
-    # a=sposy
-    # b=sposy+sheight
-    # c=sposx
-    # d=sposx+swidth
-    # dimg[a:b,c:d,:]=simg
-    # #   resize the cam image
-    # cih,ciw = img.shape[:2]
-    # ncih = int(scaling*cih)
-    # nciw = int(scaling*ciw)
-    # ccimg = cv2.resize(img,(nciw, ncih), interpolation = cv2.INTER_CUBIC)
-    # cih,ciw = ccimg.shape[:2]
-    # # position of the cam image to copy into
-    # a=cposy
-    # b=cposy+cih
-    # c=cposx
-    # d=cposx+ciw
-    # dimg[a:b,c:d,:]=ccimg
-
-    # # put the image in the window
-    # cv2.imshow('S', dimg)
-    # print ('end ... ! ' , str(timer))
+  while timer < 6:
     end = time.time()
     timer = round(end-now)
     timer = timer + 1 
   print (' start .... : ' , str(timer) )
-
-
-  # return freeze2art , cimg
-
-  # t = 6
-  # if t > 0:
-#       	mins, secs = divmod(t, 60)
-#       	timeformat = '{:02d}:{:02d}'.format(mins, secs)
-#       	print(timeformat, end='\r')
-#       	time.sleep(1)
-#       	t -= 1
-#    print('Goodbye!\n\n\n\n\n')
 
 
 def run_demo(args, mirror=False):
@@ -155,7 +101,8 @@ def run_demo(args, mirror=False):
   dimg = bimg.copy()
 
   cdown = False
-
+  counter = 0
+  max_counter = 5
   while not stopped:
 
     # read frame
@@ -290,27 +237,15 @@ def run_demo(args, mirror=False):
     key = cv2.waitKey(1)
     if key == ord('c'):
       now=time.time()
-      timer = 0
-      while timer < 5:
-        # name =  str(timer) + '.png'
-        # takeAPic(cam , mirror, scaling ,cposy,cposx , dimg)
-        # cv2.imwrite(name , dimg)
-        # cv2.imshow('Selfie 2 Art', dimg)
-        end = time.time()
-        timer = round(end-now)
-      ret_val, img = cam.read()
-      freeze2art = True
-
-    t1 =  threading.Thread(name='t1' , target = countdown , args = (cam , mirror, scaling ,cposy,cposx, sposy, sposx, sheight, swidth, style_v, bimg, args))
-    if key == ord('t'):
       cdown = True
-      t1.start()
-      # t1.join()
-      print(threading.enumerate())
-    if not t1.isAlive() and cdown:
+    if cdown and now:  
+      end = time.time()
+      counter = round(end-now)
+      print ('counter : ' , counter )
+    
+    if counter > max_counter:
       freeze2art = True
-      ret_val, img = cam.read()
-      cimg = img.copy()
+      counter = 0
       cdown = False
 
     if (key == 27 or key == ord('q')):
@@ -342,31 +277,7 @@ def main():
     raise ValueError("ERROR: cuda is not available, try running on CPU")
 
   # run demo
-  run_demo(args, mirror=True)
+  run_demo(args, mirror=False)
 
 if __name__ == '__main__':
   main()
-
-
-def takeAPic(cam , mirror, scaling ,cposy,cposx , dimg):
-
-  for i in range(5):
-    print (' start .... : ' , str(i) )
-    ret_val, img = cam.read()
-    if mirror:
-        img = cv2.flip(img, 1)
-    # cv2.imwrite('name.png', img)
-    cih,ciw = img.shape[:2]
-    ncih = int(scaling*cih)
-    nciw = int(scaling*ciw)
-    ccimg = cv2.resize(img,(nciw, ncih), interpolation = cv2.INTER_CUBIC)
-    cih,ciw = ccimg.shape[:2]
-    # position of the cam image to copy into
-    a=cposy
-    b=cposy+cih
-    c=cposx
-    d=cposx+ciw
-    dimg[a:b,c:d,:]=ccimg
-    cv2.imshow('Selfie 2 Art', dimg)
-    print ('end ... ! ' , str(i))
-

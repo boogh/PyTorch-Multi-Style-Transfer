@@ -11,17 +11,13 @@ from option import Options
 import utils
 from utils import StyleLoader
 import time
-import threading 
+import threading
 
-def countdown():
-  now=time.time()
-  timer = 0
-  while timer < 6:
-    end = time.time()
-    timer = round(end-now)
-    timer = timer + 1 
-  print (' start .... : ' , str(timer) )
 
+# This funciton will be used to add features, like animation and sound for the countdown.
+def playCountdown():
+  photo = cv2.imread('stuff/smile.jpg')
+  cv2.imshow('Smile' ,photo )
 
 def run_demo(args, mirror=False):
 
@@ -99,10 +95,13 @@ def run_demo(args, mirror=False):
   #stop when q pressed
   stopped = False
   dimg = bimg.copy()
-
+  # A variable to see if the countdown is already running
   cdown = False
-  counter = 0
-  max_counter = 5
+  # A timer for the countdown
+  timer = 0
+  # Maximung for the countdown
+  max_timer = 5
+
   while not stopped:
 
     # read frame
@@ -113,11 +112,6 @@ def run_demo(args, mirror=False):
     if mirror:
       img = cv2.flip(img, 1)
     cimg = img.copy()
-
-    # takeAPic(cam , mirror, scaling ,cposy,cposx , dimg)
-    # if the f has been pressed
-
-    # img = freeze(img , style_loaded , args)
 
     if freeze2art:
       img = np.array(img).transpose(2, 0, 1)
@@ -145,7 +139,6 @@ def run_demo(args, mirror=False):
       #img is the resulted image
       img = img.transpose(1, 2, 0).astype('uint8')
       simg = simg.transpose(1, 2, 0).astype('uint8')
-
 
       # display
       #   resize the used painting
@@ -236,16 +229,18 @@ def run_demo(args, mirror=False):
     # wait for keys
     key = cv2.waitKey(1)
     if key == ord('c'):
-      now=time.time()
       cdown = True
-    if cdown and now:  
+      now = time.time()
+    if cdown and now:
+      if timer == 1: 
+        playCountdown()
       end = time.time()
-      counter = round(end-now)
-      print ('counter : ' , counter )
-    
-    if counter > max_counter:
+      timer = round(end-now)
+      if timer == max_timer:
+        cv2.destroyWindow('Smile') 
+    if timer >= max_timer:
       freeze2art = True
-      counter = 0
+      timer = 0
       cdown = False
 
     if (key == 27 or key == ord('q')):

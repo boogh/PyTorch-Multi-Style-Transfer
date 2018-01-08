@@ -13,11 +13,61 @@ from utils import StyleLoader
 import time
 import threading
 
+# Sending Email:
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+
 
 # This funciton will be used to add features, like animation and sound for the countdown.
 def playCountdown():
   photo = cv2.imread('stuff/smile.jpg')
   cv2.imshow('Smile' ,photo )
+  # # cap_gif = cv2.VideoCapture('stuff/cdown.mp4')
+
+  # while(cap_gif.isOpened()):
+  #   ret, frame = cap_gif.read()
+  #   # gray = cv2.cvtColor(frame)
+  #   cv2.imshow('frame',frame)
+  #   if cv2.waitKey(1) & 0xFF == ord('q'):
+  #       break
+  # cap_gif.release()
+  # cv2.destroyWindow('frame')
+
+def sendEmail():
+
+  #toaddr =  toEmail 
+  toaddr = "boogh313@gmail.com"
+  fromaddr = "atestacountforaproject@gmail.com"
+  msg = MIMEMultipart()
+   
+  msg['From'] = fromaddr
+  msg['To'] = toaddr
+  msg['Subject'] = "SUBJECT OF THE EMAIL"
+   
+  body = "TEXT YOU WANT TO SEND"
+   
+  msg.attach(MIMEText(body, 'plain'))
+  
+
+  filename = "result.png"
+  attachment = open(filename, "rb")
+
+  part = MIMEBase('application', 'octet-stream')
+  part.set_payload((attachment).read())
+  encoders.encode_base64(part)
+  part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+   
+  msg.attach(part)
+   
+  server = smtplib.SMTP('smtp.gmail.com', 587)
+  server.starttls()
+  server.login(fromaddr, "googlekontoerstellen1234554321")
+  text = msg.as_string()
+  server.sendmail(fromaddr, toaddr, text)
+  server.quit()
 
 def run_demo(args, mirror=False):
 
@@ -225,6 +275,9 @@ def run_demo(args, mirror=False):
         if key2 == ord('q'):
           stopped = True
           resumed = True
+        if key2 == ord('e'):
+          cv2.imwrite('result.png' , img)
+          sendEmail()
 
     # wait for keys
     key = cv2.waitKey(1)

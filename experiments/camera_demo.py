@@ -10,29 +10,6 @@ from net import Net
 from option import Options
 import utils
 from utils import StyleLoader
-import time
-
-def countdown(freeze2art , cam):
-	ret_val, img = cam.read()
-	img = cv2.flip(img, 1)
-	cimg = img.copy()
-	countdownTime = 4
-	while countdownTime > 0 :
-		time.sleep(1)
-		countdownTime-=1
-		print(countdownTime)
-	freeze2art = True
-	return freeze2art , cimg
-
-	# t = 6
-	# if t > 0:
- #       	mins, secs = divmod(t, 60)
- #       	timeformat = '{:02d}:{:02d}'.format(mins, secs)
- #       	print(timeformat, end='\r')
- #       	time.sleep(1)
- #       	t -= 1
- #    print('Goodbye!\n\n\n\n\n')
-
 
 def run_demo(args, mirror=False):
 	# VARS
@@ -94,7 +71,7 @@ def run_demo(args, mirror=False):
 	if args.record:
 		fourcc = cv2.VideoWriter_fourcc('F','M','P','4')
 		out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (2*width, height))
-	cam = cv2.VideoCapture(0)
+	cam = cv2.VideoCapture(1)
 	cam.set(3, width)
 	cam.set(4, height)
 	key = 0
@@ -106,11 +83,7 @@ def run_demo(args, mirror=False):
 	#stop when q pressed
 	stopped = False
 	dimg = bimg.copy()
-
-	cdown = False
-
 	while not stopped:
-
 		# read frame
 		if not freeze2art:
 			ret_val, img = cam.read()
@@ -120,9 +93,6 @@ def run_demo(args, mirror=False):
 				img = cv2.flip(img, 1)
 		cimg = img.copy()
 		# if the f has been pressed
-
-		# img = freeze(img , style_loaded , args)
-
 		if freeze2art:
 			img = np.array(img).transpose(2, 0, 1)
 			# changing style (n or p has been pressed or first run)
@@ -145,11 +115,8 @@ def run_demo(args, mirror=False):
 			else:
 				simg = style_v.data[0].numpy()
 				img = img.clamp(0, 255).data[0].numpy()
-
-			#img is the resulted image	
 			img = img.transpose(1, 2, 0).astype('uint8')
 			simg = simg.transpose(1, 2, 0).astype('uint8')
-
 
 			# display
 			#   resize the used painting
@@ -185,7 +152,6 @@ def run_demo(args, mirror=False):
 			c=aposx
 			d=aposx+aiw
 			dimg[a:b,c:d,:]=aaimg
-
 		else:
 			# load on style change or first use
 			if not style_loaded:
@@ -222,68 +188,24 @@ def run_demo(args, mirror=False):
 			c=cposx
 			d=cposx+ciw
 			dimg[a:b,c:d,:]=ccimg
-
 		# put the image in the window
 		cv2.imshow('Selfie 2 Art', dimg)
 		if freeze2art:
 			resumed = False
 			#wait for r (resume) or q (quit)
 			while not resumed:
-				key2 = cv2.waitKey(1)
-				if key2 == ord('r'):
+				key = cv2.waitKey(1)
+				if key == ord('r'):
 					freeze2art = False
 					resumed = True
-				if key2 == ord('q'):
+				if key == ord('q'):
 					stopped = True
 					resumed = True
-
 		# wait for keys
 		key = cv2.waitKey(1)
-		if key == ord('c'):
-			now=time.time()
-			timer = 0
-			while timer < 5:
-				ret_val, img = cam.read()
-				if not ret_val:
-					continue
-				if mirror: 
-					img = cv2.flip(img, 1)
-				cimg = img.copy()
-
-				if args.cuda:
-					simg = style_v.cpu().data[0].numpy()
-				else:
-					simg = style_v.data[0].numpy()
-				simg = simg.transpose(1, 2, 0).astype('uint8')
-
-				# display
-				#   resize the used painting
-				simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
-				dimg = bimg.copy()
-				#   include in the image
-				# position of the source painting image to copy into
-				a=sposy
-				b=sposy+sheight
-				c=sposx
-				d=sposx+swidth
-				dimg[a:b,c:d,:]=simg
-				#   resize the cam image
-				cih,ciw = img.shape[:2]
-				ncih = int(scaling*cih)
-				nciw = int(scaling*ciw)
-				ccimg = cv2.resize(img,(nciw, ncih), interpolation = cv2.INTER_CUBIC)
-				cih,ciw = ccimg.shape[:2]
-				# position of the cam image to copy into
-				a=cposy
-				b=cposy+cih
-				c=cposx
-				d=cposx+ciw
-				dimg[a:b,c:d,:]=ccimg
-				cv2.imshow('Selfie 2 Art', dimg)
-				end = time.time()
-				timer = round(end-now)
-
-		if (key == 27 or key == ord('q')):
+		if key == 27: 
+			stopped = True
+		if key == ord('q'):
 			stopped = True
 		if key == ord('f'):
 			freeze2art = True
@@ -296,8 +218,7 @@ def run_demo(args, mirror=False):
 			idx-=1
 			if idx<0:
 				idx=8
-			style_loaded = False	
-
+			style_loaded = False
 	cam.release()
 	if args.record:
 		out.release()

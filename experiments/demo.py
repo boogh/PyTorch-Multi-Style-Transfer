@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import torch
 from screeninfo import get_monitors
+# from tkinter import *
 import tkinter as tk
 from torch.autograd import Variable
 
@@ -14,6 +15,7 @@ import time
 import threading
 
 # Sending Email:
+# from tkinter import *
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -35,39 +37,6 @@ def playCountdown():
   #       break
   # cap_gif.release()
   # cv2.destroyWindow('frame')
-
-def sendEmail():
-
-  #toaddr =  toEmail 
-  toaddr = "boogh313@gmail.com"
-  fromaddr = "atestacountforaproject@gmail.com"
-  msg = MIMEMultipart()
-   
-  msg['From'] = fromaddr
-  msg['To'] = toaddr
-  msg['Subject'] = "SUBJECT OF THE EMAIL"
-   
-  body = "TEXT YOU WANT TO SEND"
-   
-  msg.attach(MIMEText(body, 'plain'))
-  
-
-  filename = "result.png"
-  attachment = open(filename, "rb")
-
-  part = MIMEBase('application', 'octet-stream')
-  part.set_payload((attachment).read())
-  encoders.encode_base64(part)
-  part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-   
-  msg.attach(part)
-   
-  server = smtplib.SMTP('smtp.gmail.com', 587)
-  server.starttls()
-  server.login(fromaddr, "googlekontoerstellen1234554321")
-  text = msg.as_string()
-  server.sendmail(fromaddr, toaddr, text)
-  server.quit()
 
 def run_demo(args, mirror=False):
 
@@ -150,7 +119,7 @@ def run_demo(args, mirror=False):
   # A timer for the countdown
   timer = 0
   # Maximung for the countdown
-  max_timer = 5
+  max_timer = 4
 
   while not stopped:
 
@@ -275,9 +244,9 @@ def run_demo(args, mirror=False):
         if key2 == ord('q'):
           stopped = True
           resumed = True
-        if key2 == ord('e'):
-          cv2.imwrite('result.png' , img)
-          sendEmail()
+        # if key2 == ord('e'):
+        #   cv2.imwrite('result.png' , img)
+        #   sendEmail()
 
     # wait for keys
     key = cv2.waitKey(1)
@@ -329,3 +298,61 @@ def main():
 
 if __name__ == '__main__':
   main()
+
+
+
+
+# def getEmail():
+#   email = input()
+
+  # def show_entry_fields():
+  #  print("First Name: %s\n" % (e1.get()))
+  
+  # master = tk.Tk()
+  # tk.Label(master, text="Email: ").grid(row=0)
+
+  # e1 = tk.Entry(master)
+
+  # e1.grid(row=0, column=1)
+
+  # tk.Button(master, text='Quit', command=master.quit).grid(row=3, column=0, sticky=W, pady=4)
+  # tk.Button(master, text='Show', command=show_entry_fields).grid(row=3, column=1, sticky=W, pady=4)
+
+
+  # tk.mainloop( )
+
+#def sendEmail():
+
+  # email = getEmail()
+ # email = input()
+  #print (email)
+  #toaddr =  toEmail 
+  # toaddr = "boogh313@gmail.com"
+  # fromaddr = "atestacountforaproject@gmail.com"
+  # msg = MIMEMultipart()
+   
+  # msg['From'] = fromaddr
+  # msg['To'] = toaddr
+  # msg['Subject'] = "SUBJECT OF THE EMAIL"
+   
+  # body = "TEXT YOU WANT TO SEND"
+   
+  # msg.attach(MIMEText(body, 'plain'))
+  
+
+  # filename = "result.png"
+  # attachment = open(filename, "rb")
+
+  # part = MIMEBase('application', 'octet-stream')
+  # part.set_payload((attachment).read())
+  # encoders.encode_base64(part)
+  # part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+   
+  # msg.attach(part)
+   
+  # server = smtplib.SMTP('smtp.gmail.com', 587)
+  # server.starttls()
+  # server.login(fromaddr, "googlekontoerstellen1234554321")
+  # text = msg.as_string()
+  # server.sendmail(fromaddr, toaddr, text)
+  # server.quit()

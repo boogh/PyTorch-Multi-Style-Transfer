@@ -14,18 +14,24 @@ from utils import StyleLoader
 import time
 import threading
 
+# playing camera sound:
+import simpleaudio as sa
+
 # Sending Email:
 # from tkinter import *
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+# import smtplib
+# from email.mime.multipart import MIMEMultipart
+# from email.mime.text import MIMEText
+# from email.mime.base import MIMEBase
+# from email import encoders
 
 
 # This funciton will be used to add features, like animation and sound for the countdown.
 def playCountdown():
   photo = cv2.imread('stuff/smile.jpg')
+  # font = cv2.FONT_HERSHEY_SIMPLEX
+  # cv2.putText(photo,'OpenCV Tuts!',(10,500), font, 10, (255,255,255), 20, cv2.LINE_AA)
+  # cv2.imshow('image',img)
   cv2.imshow('Smile' ,photo )
   # # cap_gif = cv2.VideoCapture('stuff/cdown.mp4')
 
@@ -37,6 +43,10 @@ def playCountdown():
   #       break
   # cap_gif.release()
   # cv2.destroyWindow('frame')
+def playCameraSound():
+  wave_obj = sa.WaveObject.from_wave_file("stuff/shutter_2.wav")
+  play_obj = wave_obj.play()
+  play_obj.wait_done()
 
 def run_demo(args, mirror=False):
 
@@ -258,9 +268,11 @@ def run_demo(args, mirror=False):
         playCountdown()
       end = time.time()
       timer = round(end-now)
-      if timer == max_timer:
-        cv2.destroyWindow('Smile') 
-    if timer >= max_timer:
+    if timer == max_timer:
+      cv2.destroyWindow('Smile') 
+      playCameraSound()
+
+    # if timer == max_timer:
       freeze2art = True
       timer = 0
       cdown = False

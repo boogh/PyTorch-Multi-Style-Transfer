@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import torch
 from screeninfo import get_monitors
+# from tkinter import *
 import tkinter as tk
 from torch.autograd import Variable
 
@@ -13,11 +14,39 @@ from utils import StyleLoader
 import time
 import threading
 
+# playing camera sound:
+import simpleaudio as sa
+
+# Sending Email:
+# from tkinter import *
+# import smtplib
+# from email.mime.multipart import MIMEMultipart
+# from email.mime.text import MIMEText
+# from email.mime.base import MIMEBase
+# from email import encoders
+
 
 # This funciton will be used to add features, like animation and sound for the countdown.
 def playCountdown():
   photo = cv2.imread('stuff/smile.jpg')
+  # font = cv2.FONT_HERSHEY_SIMPLEX
+  # cv2.putText(photo,'OpenCV Tuts!',(10,500), font, 10, (255,255,255), 20, cv2.LINE_AA)
+  # cv2.imshow('image',img)
   cv2.imshow('Smile' ,photo )
+  # # cap_gif = cv2.VideoCapture('stuff/cdown.mp4')
+
+  # while(cap_gif.isOpened()):
+  #   ret, frame = cap_gif.read()
+  #   # gray = cv2.cvtColor(frame)
+  #   cv2.imshow('frame',frame)
+  #   if cv2.waitKey(1) & 0xFF == ord('q'):
+  #       break
+  # cap_gif.release()
+  # cv2.destroyWindow('frame')
+def playCameraSound():
+  wave_obj = sa.WaveObject.from_wave_file("stuff/shutter_2.wav")
+  play_obj = wave_obj.play()
+  play_obj.wait_done()
 
 def run_demo(args, mirror=False):
 
@@ -100,7 +129,7 @@ def run_demo(args, mirror=False):
   # A timer for the countdown
   timer = 0
   # Maximung for the countdown
-  max_timer = 5
+  max_timer = 4
 
   while not stopped:
 
@@ -225,6 +254,9 @@ def run_demo(args, mirror=False):
         if key2 == ord('q'):
           stopped = True
           resumed = True
+        # if key2 == ord('e'):
+        #   cv2.imwrite('result.png' , img)
+        #   sendEmail()
 
     # wait for keys
     key = cv2.waitKey(1)
@@ -236,9 +268,11 @@ def run_demo(args, mirror=False):
         playCountdown()
       end = time.time()
       timer = round(end-now)
-      if timer == max_timer:
-        cv2.destroyWindow('Smile') 
-    if timer >= max_timer:
+    if timer == max_timer:
+      cv2.destroyWindow('Smile') 
+      playCameraSound()
+
+    # if timer == max_timer:
       freeze2art = True
       timer = 0
       cdown = False
@@ -276,3 +310,61 @@ def main():
 
 if __name__ == '__main__':
   main()
+
+
+
+
+# def getEmail():
+#   email = input()
+
+  # def show_entry_fields():
+  #  print("First Name: %s\n" % (e1.get()))
+  
+  # master = tk.Tk()
+  # tk.Label(master, text="Email: ").grid(row=0)
+
+  # e1 = tk.Entry(master)
+
+  # e1.grid(row=0, column=1)
+
+  # tk.Button(master, text='Quit', command=master.quit).grid(row=3, column=0, sticky=W, pady=4)
+  # tk.Button(master, text='Show', command=show_entry_fields).grid(row=3, column=1, sticky=W, pady=4)
+
+
+  # tk.mainloop( )
+
+#def sendEmail():
+
+  # email = getEmail()
+ # email = input()
+  #print (email)
+  #toaddr =  toEmail 
+  # toaddr = "boogh313@gmail.com"
+  # fromaddr = "atestacountforaproject@gmail.com"
+  # msg = MIMEMultipart()
+   
+  # msg['From'] = fromaddr
+  # msg['To'] = toaddr
+  # msg['Subject'] = "SUBJECT OF THE EMAIL"
+   
+  # body = "TEXT YOU WANT TO SEND"
+   
+  # msg.attach(MIMEText(body, 'plain'))
+  
+
+  # filename = "result.png"
+  # attachment = open(filename, "rb")
+
+  # part = MIMEBase('application', 'octet-stream')
+  # part.set_payload((attachment).read())
+  # encoders.encode_base64(part)
+  # part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+   
+  # msg.attach(part)
+   
+  # server = smtplib.SMTP('smtp.gmail.com', 587)
+  # server.starttls()
+  # server.login(fromaddr, "googlekontoerstellen1234554321")
+  # text = msg.as_string()
+  # server.sendmail(fromaddr, toaddr, text)
+  # server.quit()

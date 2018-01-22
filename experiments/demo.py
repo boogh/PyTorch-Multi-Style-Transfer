@@ -26,27 +26,24 @@ import simpleaudio as sa
 # from email import encoders
 
 
-# This funciton will be used to add features, like animation and sound for the countdown.
-def playCountdown():
-  photo = cv2.imread('stuff/smile.jpg')
-  # font = cv2.FONT_HERSHEY_SIMPLEX
-  # cv2.putText(photo,'OpenCV Tuts!',(10,500), font, 10, (255,255,255), 20, cv2.LINE_AA)
-  # cv2.imshow('image',img)
-  cv2.imshow('Smile' ,photo )
-  # # cap_gif = cv2.VideoCapture('stuff/cdown.mp4')
 
-  # while(cap_gif.isOpened()):
-  #   ret, frame = cap_gif.read()
-  #   # gray = cv2.cvtColor(frame)
-  #   cv2.imshow('frame',frame)
-  #   if cv2.waitKey(1) & 0xFF == ord('q'):
-  #       break
-  # cap_gif.release()
-  # cv2.destroyWindow('frame')
 def playCameraSound():
   wave_obj = sa.WaveObject.from_wave_file("stuff/shutter_2.wav")
   play_obj = wave_obj.play()
   play_obj.wait_done()
+
+def drawText(img , timer , position = 1400): 
+
+  print(timer) 
+  if timer == 1:
+    text = 'Smile'
+  elif timer <= 0 :
+    text = ''
+  else: 
+    text = str(timer)
+  font = cv2.FONT_HERSHEY_SIMPLEX
+  color = (0,255,0)
+  cv2.putText(img, text ,(int(position/2) + 100 ,180), font, 5 , (255,255,255)  , 6 , cv2.LINE_AA)
 
 def run_demo(args, mirror=False):
 
@@ -72,8 +69,8 @@ def run_demo(args, mirror=False):
   screen_height = root.winfo_screenheight()
 
   # fix to resolution of external screen - then it pops to that screen on my linux laptop (hack)
-  screen_width=1920
-  screen_height=1080
+  #screen_width=1920
+  #screen_height=1080
 
   # calculate positions of images in screen
   cposx=int(cam_x*screen_width)
@@ -129,7 +126,8 @@ def run_demo(args, mirror=False):
   # A timer for the countdown
   timer = 0
   # Maximung for the countdown
-  max_timer = 4
+  max_timer = 5
+
 
   while not stopped:
 
@@ -221,6 +219,13 @@ def run_demo(args, mirror=False):
       #   resize the used painting
       simg = cv2.resize(simg,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
       dimg = bimg.copy()
+      if cdown:
+        #if max_timer > timer:
+        drawText(dimg , max_timer - timer)
+        #else:
+          #drawText(dimg , 0)
+
+
       #   include in the image
       # position of the source painting image to copy into
       a=sposy
@@ -264,14 +269,10 @@ def run_demo(args, mirror=False):
       cdown = True
       now = time.time()
     if cdown and now:
-      if timer == 1: 
-        playCountdown()
       end = time.time()
       timer = round(end-now)
-    if timer == max_timer:
-      cv2.destroyWindow('Smile') 
+    if timer > max_timer:
       playCameraSound()
-
     # if timer == max_timer:
       freeze2art = True
       timer = 0
@@ -319,7 +320,7 @@ if __name__ == '__main__':
 
   # def show_entry_fields():
   #  print("First Name: %s\n" % (e1.get()))
-  
+
   # master = tk.Tk()
   # tk.Label(master, text="Email: ").grid(row=0)
 
@@ -338,19 +339,19 @@ if __name__ == '__main__':
   # email = getEmail()
  # email = input()
   #print (email)
-  #toaddr =  toEmail 
+  #toaddr =  toEmail
   # toaddr = "boogh313@gmail.com"
   # fromaddr = "atestacountforaproject@gmail.com"
   # msg = MIMEMultipart()
-   
+
   # msg['From'] = fromaddr
   # msg['To'] = toaddr
   # msg['Subject'] = "SUBJECT OF THE EMAIL"
-   
+
   # body = "TEXT YOU WANT TO SEND"
-   
+
   # msg.attach(MIMEText(body, 'plain'))
-  
+
 
   # filename = "result.png"
   # attachment = open(filename, "rb")
@@ -359,12 +360,32 @@ if __name__ == '__main__':
   # part.set_payload((attachment).read())
   # encoders.encode_base64(part)
   # part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-   
+
   # msg.attach(part)
-   
+
   # server = smtplib.SMTP('smtp.gmail.com', 587)
   # server.starttls()
   # server.login(fromaddr, "googlekontoerstellen1234554321")
   # text = msg.as_string()
   # server.sendmail(fromaddr, toaddr, text)
   # server.quit()
+
+
+# This funciton will be used to add features, like animation and sound for the countdown.
+#def playCountdown():
+ # pass
+  #photo = cv2.imread('stuff/smile.jpg')
+  # font = cv2.FONT_HERSHEY_SIMPLEX
+  # cv2.putText(photo,'OpenCV Tuts!',(10,500), font, 10, (255,255,255), 20, cv2.LINE_AA)
+  # cv2.imshow('image',img)
+  #cv2.imshow('Smile' ,photo )
+  # # cap_gif = cv2.VideoCapture('stuff/cdown.mp4')
+
+  # while(cap_gif.isOpened()):
+  #   ret, frame = cap_gif.read()
+  #   # gray = cv2.cvtColor(frame)
+  #   cv2.imshow('frame',frame)
+  #   if cv2.waitKey(1) & 0xFF == ord('q'):
+  #       break
+  # cap_gif.release()
+  # cv2.destroyWindow('frame')

@@ -26,37 +26,19 @@ import simpleaudio as sa
 # from email import encoders
 
 
-# This funciton will be used to add features, like animation and sound for the countdown.
-def playCountdown():
-  pass
-  #photo = cv2.imread('stuff/smile.jpg')
-  # font = cv2.FONT_HERSHEY_SIMPLEX
-  # cv2.putText(photo,'OpenCV Tuts!',(10,500), font, 10, (255,255,255), 20, cv2.LINE_AA)
-  # cv2.imshow('image',img)
-  #cv2.imshow('Smile' ,photo )
-  # # cap_gif = cv2.VideoCapture('stuff/cdown.mp4')
-
-  # while(cap_gif.isOpened()):
-  #   ret, frame = cap_gif.read()
-  #   # gray = cv2.cvtColor(frame)
-  #   cv2.imshow('frame',frame)
-  #   if cv2.waitKey(1) & 0xFF == ord('q'):
-  #       break
-  # cap_gif.release()
-  # cv2.destroyWindow('frame')
 
 def playCameraSound():
   wave_obj = sa.WaveObject.from_wave_file("stuff/shutter_2.wav")
   play_obj = wave_obj.play()
   play_obj.wait_done()
 
-def drawText(img , timer , position = 1400):
-  print (str(timer))
-  
-  if timer <= 1:
+def drawText(img , timer , position = 1400): 
+
+  print(timer) 
+  if timer == 1:
     text = 'Smile'
-  if timer <= 0 :
-    text = '--'
+  elif timer <= 0 :
+    text = ''
   else: 
     text = str(timer)
   font = cv2.FONT_HERSHEY_SIMPLEX
@@ -144,7 +126,7 @@ def run_demo(args, mirror=False):
   # A timer for the countdown
   timer = 0
   # Maximung for the countdown
-  max_timer = 4
+  max_timer = 5
 
 
   while not stopped:
@@ -287,15 +269,10 @@ def run_demo(args, mirror=False):
       cdown = True
       now = time.time()
     if cdown and now:
-      #drawText(dimg , timer)
-      #if timer == 1:
-      #  playCountdown()
       end = time.time()
       timer = round(end-now)
     if timer > max_timer:
-      #cv2.destroyWindow('Smile')
       playCameraSound()
-
     # if timer == max_timer:
       freeze2art = True
       timer = 0
@@ -392,3 +369,23 @@ if __name__ == '__main__':
   # text = msg.as_string()
   # server.sendmail(fromaddr, toaddr, text)
   # server.quit()
+
+
+# This funciton will be used to add features, like animation and sound for the countdown.
+#def playCountdown():
+ # pass
+  #photo = cv2.imread('stuff/smile.jpg')
+  # font = cv2.FONT_HERSHEY_SIMPLEX
+  # cv2.putText(photo,'OpenCV Tuts!',(10,500), font, 10, (255,255,255), 20, cv2.LINE_AA)
+  # cv2.imshow('image',img)
+  #cv2.imshow('Smile' ,photo )
+  # # cap_gif = cv2.VideoCapture('stuff/cdown.mp4')
+
+  # while(cap_gif.isOpened()):
+  #   ret, frame = cap_gif.read()
+  #   # gray = cv2.cvtColor(frame)
+  #   cv2.imshow('frame',frame)
+  #   if cv2.waitKey(1) & 0xFF == ord('q'):
+  #       break
+  # cap_gif.release()
+  # cv2.destroyWindow('frame')
